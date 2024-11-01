@@ -1,0 +1,149 @@
+﻿namespace InternSystemCore.Pages
+
+body {
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(51,94,106,1) 51%, rgba(40,75,99,1) 100%);
+}
+
+.container {
+    max-width: 75%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    align-content: end;
+    margin: 0 auto;
+    text-align: left;
+    flex-direction: column;
+    float: center;
+    margin-top: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    background-color: #fff;
+}
+
+
+.back-button {
+    float: inline-end;
+    margin: 20px;
+}
+
+.col-12 {
+    margin: 10px;
+    float: center;
+}
+
+/* Style the navigation bar */
+.navbar {
+    width: 100%;
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(51,94,106,1) 51%, rgba(40,75,99,1) 100%);
+    overflow: auto;
+}
+
+    /* Navbar links */
+    .navbar a {
+        float: left;
+        text-align: center;
+        padding: 12px;
+        color: white;
+        text-decoration: none;
+        font-size: 17px;
+    }
+
+        /* Navbar links on mouse-over */
+        .navbar a:hover {
+            background-color: #284b63;
+        }
+
+/* Current/active navbar link */
+.active {
+    background-color: #284b63;
+}
+
+/* Add responsiveness - will automatically display the navbar vertically instead of horizontally on screens less than 500 pixels */
+@media screen and (max-width: 500px) {
+    .navbar a {
+        float: none;
+        display: block;
+    }
+}
+
+@import url(https://fonts.googleapis.com/css?family=Poppins:300);
+@import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css) 
+
+body{
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Poppins";
+    background: rgb(2,0,36);
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(51,94,106,1) 51%, rgba(40,75,99,1) 100%);
+}
+
+.login-page {
+    width: 400px;
+    padding: 8% 0 0;
+    margin: auto;
+}
+
+.form {
+    position: relative;
+    z-index: 1;
+    background: #FFFFFF;
+    max-width: 400px;
+    margin: 0 auto 100px;
+    padding: 45px;
+    text-align: center;
+    border-radius: 15px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+    .form input {
+        font-family: "Poppins", sans-serif;
+        outline: 0;
+        background: #f2f2f2;
+        width: 100%;
+        border: 0;
+        border-radius: 7px;
+        margin: 0 0 15px;
+        padding: 15px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    .form button {
+        font-family: "Poppins", sans-serif;
+        text-transform: uppercase;
+        outline: 0;
+        background: #3c6e71;
+        width: 100%;
+        border: 0;
+        padding: 15px;
+        color: #FFFFFF;
+        border-radius: 7px;
+        font-size: 14px;
+        -webkit-transition: all 0.3 ease;
+        transition: all 0.3 ease;
+        cursor: pointer;
+    }
+
+        .form button:hover, .form button:active, .form button:focus {
+            background: #284b63;
+        }
+
+    .form .message {
+        margin: 15px 0 0;
+        color: #7c7b7b;
+        font-size: 12px;
+    }
+
+        .form .message a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+    .form .register-form {
+        display: none;
+    }
+

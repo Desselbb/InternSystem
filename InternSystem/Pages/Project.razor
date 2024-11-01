@@ -1,0 +1,167 @@
+﻿@page "/Project"
+@using InternSystemClassLibrary.Models
+@using InternSystemClassLibrary
+@inject DepartmentService DepartmentService
+@using Blazored.LocalStorage;
+@inject ILocalStorageService localStorage
+<h3>Projects</h3>
+
+
+
+<center>
+    <div class="container">
+       <EditForm Model="@Model" OnValidSubmit="@Process">
+            <div class="add-project">
+                <h3>Add Project</h3>
+                <div class="col-6">
+                    <label for="projectname"></label>
+                    <InputText placeholder="project name" aria-label="Project" id="project" @bind-Value="@Model.Name" class="form-control"/>
+                </div>
+                <br>
+                <div class="col-6">
+                    <label for="description"></label>
+                    <InputText class="form-control" placeholder="description" aria-label="Description" id="description" @bind-Value="@Model.Description" />
+                </div>
+                <br>
+                <div class="col-6">
+                    <label for="inputDept" class="form-label"></label>
+                    <InputSelect id="inputDept" class="form-select" asp-for="Department" @bind-Value="@Model.DepartmentId">
+                        <option value="disabled">Department</option>
+                             @foreach (var department in departments)
+                              {
+                                <option value="@department.Name">@department.Name</option>
+                              }
+                    
+                    </InputSelect>
+                </div>
+                <br>
+                <div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</center>
+
+
+<div class="back-button">
+    <a class="btn btn-primary" href="AdminDashboard" role="button">Back</a>
+</div>
+
+<center>
+<div class="container">
+<table class="table table-striped table-bordered table-hover mt-4">
+    <caption>List of Projects</caption>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Department</th>
+            <th>Actions</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in tableData)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Description</td>
+                <td>@item.DepartmentId</td>
+
+                <td>
+                    <button @onclick="()=>Edit(item)" class="btn btn-warning btn-sm"><i class="oi oi-pencil"></i></button>
+                    <button @onclick="()=>Delete(item)" class="btn btn-danger btn-sm"><i class="oi oi-trash"></i></button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+</center>
+
+
+@code {
+
+    List<InternSystemClassLibrary.Models.Project> tableData = new();
+    InternSystemClassLibrary.Models.Project Model { get; set; } = new();
+
+    private List<InternSystemClassLibrary.Models.Department> departments;
+    private List<InternSystemClassLibrary.Models.Project> projects;
+
+    protected override void OnInitialized()
+    {
+        departments = DepartmentService.GetAll();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadProjects();
+        }
+    }
+
+    private async Task LoadProjects()
+    {
+        try
+        {
+            projects = await localStorage.GetItemAsync<List<InternSystemClassLibrary.Models.Project>>("projects");
+            if (projects == null || !departments.Any())
+            {
+                projects = projectService.GetAll();
+                await localStorage.SetItemAsync("projects", projects);
+            }
+            tableData = projects;
+            StateHasChanged();
+            Console.WriteLine("Projects loaded successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading projects: {ex.Message}");
+        }
+    }
+
+
+    void AddToProject(int project, int projectId)
+    {
+
+    }
+    void Process()
+    {
+        if (Model.Id == 0)
+        {
+            if (projectService.Add(Model))
+            {
+                ReloadData();
+            }
+        }
+        else
+        {
+            if (projectService.Update(Model))
+            {
+                ReloadData();
+            }
+        }
+    }
+    void ReloadData()
+    {
+        Model = new();
+        tableData = projectService.GetAll();
+        StateHasChanged();
+
+    }
+    void Edit(InternSystemClassLibrary.Models.Project record)
+    {
+        Model = record;
+    }
+    void Delete(InternSystemClassLibrary.Models.Project record)
+    {
+        if (projectService.Delete(record))
+        {
+            ReloadData();
+        }
+    }
+}
+

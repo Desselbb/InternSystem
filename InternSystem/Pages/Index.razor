@@ -1,0 +1,79 @@
+﻿@page "/"
+
+<PageTitle>Login</PageTitle>
+
+@using Microsoft.AspNetCore.Components.Forms
+
+<body style="display:flex; align-items:center; justify-content:center;">
+    <div class="login-page">
+        <div class="form">
+            <EditForm Model="@Model" OnValidSubmit="@Process">
+                <p class="message" style=" font: bold; font-size: larger;">
+                    Please contact the administration or <NavLink href="/">Login</NavLink>
+                </p>
+            </EditForm>
+            <EditForm Model="@Model" OnValidSubmit="HandleLoginSubmit">
+                <h2>Intern Information System</h2>
+                <h3><i class="fas fa-lock"></i> Login</h3>
+                <InputText id="username" placeholder="Username" @bind-Value="Model.Email" required class="form-control" />
+                <InputText id="password" type="password" placeholder="Password" @bind-Value="Model.Password" required class="form-control" />
+                <button type="submit" class="btn btn-primary">login</button>
+                <p class="message">Can't <NavLink href="#">remember password?</NavLink></p>
+            </EditForm>
+        </div>
+    </div>
+</body>
+
+@code {
+
+
+    List<InternSystemClassLibrary.Models.PersonalDetails> tableData = new();
+    InternSystemClassLibrary.Models.PersonalDetails Model { get; set; } = new();
+
+
+    private void HandleLoginSubmit()
+    {
+        var user = tableData.FirstOrDefault(u => u.Email == Model.Email && u.Password == Model.Password);
+
+        if (user != null)
+        {
+            // Successfully logged in
+            Console.WriteLine("Login successful!");
+            // Redirect or perform any post-login actions
+        }
+        else
+        {
+            // Login failed
+            Console.WriteLine("Invalid email or password.");
+        }
+    }
+
+ 
+
+    void Process()
+    {
+        if (Model.Id == 0)
+        {
+            if (personalDetailsService.Add(Model))
+            {
+                ReloadData();
+            }
+        }
+        else
+        {
+            if (personalDetailsService.Update(Model))
+            {
+                ReloadData();
+            }
+        }
+    }
+    void ReloadData()
+    {
+        Model = new();
+        tableData = personalDetailsService.GetAll();
+        StateHasChanged();
+
+    }
+
+}
+

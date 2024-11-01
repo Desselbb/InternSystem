@@ -1,0 +1,88 @@
+﻿@page "/Logs"
+<h3>Logs</h3>
+@using InternSystemClassLibrary.Models
+@using InternSystemClassLibrary
+@using InternSystemClassLibrary.Enums;
+@using InternSystemCore.Services;
+
+
+
+<center>
+    <div class="container">
+        <EditForm Model="@Model" OnValidSubmit="@Process">
+        <DataAnnotationsValidator />
+            <h3>Add Logs</h3>
+            <div class="log-container">
+                <ul id="logList"></ul>
+            </div>
+            <div class="col-5">
+                <label for="issueInput" class="form-label"></label>
+
+                <InputTextArea id="issueInput" class="form-control" @bind-Value="@Model.Message" placeholder="Enter your progress here"></InputTextArea>
+                <button type="button" class="btn btn-danger" @onclick="() => SubmitIssue(Log.Issue)"  >Submit as Issue</button>
+                <button type="button" class="btn btn-primary" @onclick="() => SubmitIssue(Log.NotIssue)">Submit Log</button>
+                <p>Last Updated: @Model.CommentDate.ToString("g")</p>
+            </div>
+        </EditForm>
+    </div>
+</center>
+
+@code {
+    List<InternSystemClassLibrary.Models.ProjectComments> tableData = new();
+    InternSystemClassLibrary.Models.ProjectComments Model { get; set; } = new();
+    private ProjectComments taskModel = new ProjectComments();
+    private List<PersonalDetails> users;
+
+    protected override void OnInitialized()
+    {
+        // Load users (replace with actual data fetching logic)
+       // users = internService.Get();
+    }
+
+
+    private void SubmitIssue(Log log )
+    {
+
+        taskModel.Log = log;
+ 
+
+    }
+    private void SubmitLog()
+    {
+        Model.CommentDate = DateTime.Now;
+        // Additional logic for submitting the log
+        Console.WriteLine($"Log submitted at {Model.CommentDate}");
+    }
+
+
+    void AddToProject(int project, int projectId)
+    {
+
+    }
+    void Process()
+    {
+        if (Model.Id == 0)
+        {
+            if (projectCommentService.Add(Model))
+            {
+                ReloadData();
+            }
+        }
+        else
+        {
+            if (projectCommentService.Update(Model))
+            {
+                ReloadData();
+            }
+        }
+    }
+    void ReloadData()
+    {
+        Model = new();
+        tableData = projectCommentService.GetAll();
+        StateHasChanged();
+
+    }
+
+
+}

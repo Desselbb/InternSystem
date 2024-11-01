@@ -1,0 +1,123 @@
+﻿@page "/Department"
+@using InternSystemClassLibrary.Models
+@using InternSystemClassLibrary
+@using Blazored.LocalStorage;
+@inject ILocalStorageService localStorage
+@inject DepartmentService DepartmentService
+
+
+<h3>Departments</h3>
+<EditForm Model="@Model" OnValidSubmit="@Process">
+     <DataAnnotationsValidator />
+    <div class="inline-content">
+        <div class="col-md-6">
+            <label for="name">Department Name</label>
+            <InputText id="name" @bind-Value="@Model.Name" class="form-control" />
+        </div>
+        
+    </div>
+    <div class="col-lg-4 pt-4">
+        <button type="submit" class="btn btn-success"><i class="oi oi-file"></i>Save</button>
+    </div>
+    <hr />
+</EditForm>
+<table class="table table-striped table-bordered table-hover mt-4">
+    <caption>List of Departments</caption>
+    <thead>
+        <tr>
+            <th>Name</th>            
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in tableData)
+        {
+            <tr>
+                <td>@item.Name</td>                
+                <td>
+                    <button @onclick="()=>Edit(item)" class="btn btn-warning btn-sm"><i class="oi oi-pencil"></i></button>
+                    <button @onclick="()=>Delete(item)" class="btn btn-danger btn-sm"><i class="oi oi-trash"></i></button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+
+    List<InternSystemClassLibrary.Models.Department> tableData = new();
+    InternSystemClassLibrary.Models.Department Model { get; set; } = new();
+
+    private List<InternSystemClassLibrary.Models.Department> departments;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadDepartments();
+        }
+    }
+
+    private async Task LoadDepartments()
+    {
+        try
+        {
+            departments = await localStorage.GetItemAsync<List<InternSystemClassLibrary.Models.Department>>("departments");
+            if (departments == null || !departments.Any())
+            {
+                departments = departmentService.GetAll();
+                await localStorage.SetItemAsync("departments", departments);
+            }
+            tableData = departments;
+            StateHasChanged();
+            Console.WriteLine("Departments loaded successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading departments: {ex.Message}");
+        }
+    }
+
+    void AddToProject(int intern, int deptId)
+    {
+
+    }
+    async void Process()
+    {
+        if (Model.Id == 0)
+        {
+            if (departmentService.Add(Model))
+            {
+               await ReloadData();
+            }
+        }
+        else
+        {
+            if (departmentService.Update(Model))
+            {
+               await ReloadData();
+            }
+        }
+    }
+     async Task ReloadData()
+    {
+        Model = new();
+        tableData = departmentService.GetAll();
+        await localStorage.SetItemAsync("departments", tableData);
+        StateHasChanged();
+
+    }
+    void Edit(InternSystemClassLibrary.Models.Department record)
+    {
+        Model = record;
+    }
+    async void Delete(InternSystemClassLibrary.Models.Department record)
+    {
+        if (departmentService.Delete(record))
+        {
+            await ReloadData();
+        }
+    }
+}

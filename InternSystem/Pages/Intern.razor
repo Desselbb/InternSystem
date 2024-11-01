@@ -1,0 +1,131 @@
+﻿@page "/Intern"
+@using InternSystemClassLibrary.Models
+@using InternSystemClassLibrary
+@inject DepartmentService DepartmentService
+<h3>Interns</h3>
+
+<div class="navbar">
+    <a href="AdminDashboard"><i class="fa fa-fw fa-home"></i> Admin Dashboard</a>
+    <a href="Index"><i class="fa fa-sign-out"></i> Sign out</a>
+</div>
+
+<center>
+   <div class="container">
+    <EditForm Model="@Model" OnValidSubmit="@Process">
+    
+     <div class="col-5">
+        <label for="inputDept" class="form-label">Department</label>
+        <InputSelect id="inputDept" class="form-select" @bind-Value="@Model.DepartmentId">
+            <option value="disabled">Select Department</option>
+            @foreach (var department in departments)
+            {
+                <option value="@department.Id">@department.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+
+    <div class="col-5">
+             <NavLink href="PersonalDetails" class="nav-link">
+                Personal Details
+            </NavLink>
+    </div>
+
+    
+    <div class="col-5">
+        <label for="startDate" class="form-label">Start Date:</label>
+        <InputDate class="form-control" id="startDate" @bind-Value="@Model.DateCreate" required />
+    </div>
+    
+    <div class="col-5">
+        <label for="endDate" class="form-label">End Date:</label>
+        <InputDate class="form-control" id="endDate" @bind-Value="@Model.DateUpdate" required />
+    </div>
+    
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+ </EditForm>
+
+<table class="table table-striped table-bordered table-hover mt-4">
+    <caption>List of Departments</caption>
+    <thead>
+        <tr>
+      
+            <th>Department</th>
+            <th>Date Created</th>
+            <th>Stop Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in tableData)
+        {
+            <tr>
+                <td>@item.DepartmentId</td>
+                <td>@item.DateCreate</td>
+                <td>@item.DateUpdate</td>
+                <td>
+                    <button @onclick="()=>Edit(item)" class="btn btn-warning btn-sm"><i class="oi oi-pencil"></i></button>
+                    <button @onclick="()=>Delete(item)" class="btn btn-danger btn-sm"><i class="oi oi-trash"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+</center>
+
+@code {
+
+    List<InternSystemClassLibrary.Models.Intern> tableData = new();
+    InternSystemClassLibrary.Models.Intern Model { get; set; } = new();
+
+    private List<InternSystemClassLibrary.Models.Department> departments;
+
+    protected override void OnInitialized()
+    {
+        departments = DepartmentService.GetAll();
+
+    }
+    
+    void AddToIntern(int intern, int deptId)
+    {
+
+    }
+    void Process()
+    {
+        if (Model.Id == 0)
+        {
+            if (internService.Add(Model))
+            {
+                ReloadData();
+            }
+        }
+        else
+        {
+            if (internService.Update(Model))
+            {
+                ReloadData();
+            }
+        }
+    }
+    void ReloadData()
+    {
+        Model = new();
+        tableData = internService.GetAll();
+        StateHasChanged();
+
+    }
+    void Edit(InternSystemClassLibrary.Models.Intern record)
+    {
+        Model = record;
+    }
+    void Delete(InternSystemClassLibrary.Models.Intern record)
+    {
+        if (internService.Delete(record))
+        {
+            ReloadData();
+        }
+    }
+}

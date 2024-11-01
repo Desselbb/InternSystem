@@ -1,0 +1,182 @@
+﻿@page "/PersonalDetails"
+@using InternSystemClassLibrary.Models
+@using InternSystemClassLibrary
+@using InternSystemClassLibrary.Enums;
+<h3>Personal Details</h3>
+
+
+<center>
+<div class="container">
+
+        <EditForm Model="@Model" OnValidSubmit="@Process">
+
+
+            <div class="col-5">
+                <label for="firstname" class="form-label">First Name</label>
+                <InputText type="firstname" class="form-control" id="firstname" @bind-Value="@Model.FirstName" />
+            </div>
+
+
+            <div class="col-5">
+                <label for="lastname" class="form-label">Last Name</label>
+                <InputText type="lastname" class="form-control" id="lastname" @bind-Value="@Model.LastName" />
+            </div>
+
+            <div class="col-5">
+                <label for="inputPassword4" class="form-label">Password</label>
+                <InputText type="password" class="form-control" id="inputPassword4" @bind-Value="@Model.Password" />
+            </div>
+
+
+            <div class="col-5">
+                <label for="inputAddress" class="form-label">Address</label>
+                <InputText class="form-control" id="inputAddress" placeholder="Example: 34 Nkana East" @bind-Value="@Model.Address" />
+            </div>
+
+            <div class="col-5">
+                <label for="inputContact" class="form-label">Contact Number</label>
+                <InputText type="tel" class="form-control" id="inputContact" @bind-Value="@Model.Contact" />
+            </div>
+
+            <div class="col-5">
+                <label for="inputGender" class="form-label">Gender</label>
+                <InputSelect class="form-select" id="inputGender" @bind-Value="@Model.Gender">
+                    <option value="">Select Gender</option>
+                    @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                    {
+                        <option value="@gender">@gender</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="col-5">
+                <label for="inputImage" class="form-label">Upload Image</label>
+                <InputFile class="form-control" id="inputImage" @bind-Value="@Model.Image" />
+            </div>
+
+            <div class="col-5">
+                <label for="inputEmail4" class="form-label">Email</label>
+                <InputText type="email" class="form-control" id="inputEmail4" placeholder="name@gmail.com" @bind-Value="@Model.Email" />
+            </div>
+
+             <div class="form-group">
+              <label for="gender">Gender</label>
+               <InputSelect id="gender" class="form-control" @bind-Value="Model.Gender">
+                     @foreach (var gender in Enum.GetValues(typeof(Gender)))
+                          {
+                             <option value="@gender">@gender</option>
+                          }
+              </InputSelect>
+    </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </EditForm>
+
+     
+
+  
+
+</div>
+
+<table class="table table-striped table-bordered table-hover mt-4">
+    <caption>List of Interns</caption>
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Password</th>
+            <th>Address</th>
+            <th>Contact</th>
+            <th>Gender</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in tableData)
+        {
+            <tr>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.Password</td>
+                <td>@item.Address</td>
+                <td>@item.Contact</td>
+                <td>@item.Gender</td>
+                <td>@item.Image</td>
+                <td>
+                    <button @onclick="()=>Edit(item)" class="btn btn-warning btn-sm"><i class="oi oi-pencil"></i></button>
+                    <button @onclick="()=>Delete(item)" class="btn btn-danger btn-sm"><i class="oi oi-trash"></i></button>
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+</center>
+
+
+@code {
+
+    List<InternSystemClassLibrary.Models.PersonalDetails> tableData = new();
+    InternSystemClassLibrary.Models.PersonalDetails Model { get; set; } = new();
+
+    private void HandleFileChange(InputFileChangeEventArgs e)
+    {
+        // Ensure a file is provided
+        var image = e.File;
+        if (image!= null)
+        {
+            using (var stream = image.OpenReadStream())
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    stream.CopyTo(memoryStream);
+                    Model.Image = memoryStream.ToArray();
+                }
+            }
+
+            // Optionally, you can get more information about the file
+            Model.FirstName = image.Name;
+           
+        }
+    }
+
+
+    void Process()
+    {
+        if (Model.Id == 0)
+        {
+            if (personalDetailsService.Add(Model))
+            {
+                ReloadData();
+            }
+        }
+        else
+        {
+            if (personalDetailsService.Update(Model))
+            {
+                ReloadData();
+            }
+        }
+    }
+    void ReloadData()
+    {
+        Model = new();
+        tableData = personalDetailsService.GetAll();
+        StateHasChanged();
+
+    }
+    void Edit(InternSystemClassLibrary.Models.PersonalDetails record)
+    {
+        Model = record;
+    }
+    void Delete(InternSystemClassLibrary.Models.PersonalDetails record)
+    {
+        if (personalDetailsService.Delete(record))
+        {
+            ReloadData();
+        }
+    }
+}
